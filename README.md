@@ -1,55 +1,183 @@
-# Habit Tracker
+<div align="center">
 
-A small command-line habit tracker built for an IU Germany OOP/functional programming project. Track daily and weekly habits, log completions, and check streaks with a bit of analytics on the side.
+# Habit Forge
 
-## Requirements
+**Build habits. Track streaks. Actually stick to it.**
 
-- Python 3.7+
-- pip
+A command-line habit tracker built for **IU Germany** — object-oriented design meets functional analytics in plain Python.
 
-## Install
+[![Python](https://img.shields.io/badge/Python-3.7%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![SQLite](https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Click](https://img.shields.io/badge/CLI-Click-000000?style=for-the-badge)](https://click.palletsprojects.com/)
+[![pytest](https://img.shields.io/badge/Tests-pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Portfolio](https://img.shields.io/badge/Type-Academic%20Project-purple?style=for-the-badge)]()
+[![IU](https://img.shields.io/badge/IU-Germany-E30613?style=for-the-badge)](https://www.iu.org/)
+
+[![Repo](https://img.shields.io/badge/GitHub-habit--forge--iu--germany-181717?style=flat-square&logo=github)](https://github.com/SudhanshuBiswas01/habit-forge-iu-germany)
+[![Status](https://img.shields.io/badge/Status-Portfolio%20Project-blue?style=flat-square)]()
+[![OOP](https://img.shields.io/badge/Paradigm-OOP%20%2B%20Functional-orange?style=flat-square)]()
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square)]()
+
+[Features](#-features) · [Install](#-installation) · [Usage](#-usage) · [Tests](#-testing) · [Structure](#-project-structure) · [Author](#-author)
+
+</div>
+
+---
+
+## About
+
+**Habit Forge** is a terminal-based habit tracker where you create daily or weekly habits, log completions, and watch your streaks grow (or crumble). No web server, no ORM — just Python, SQLite, and a Click-powered menu.
+
+Built as a **5th semester elective** project: *Object Oriented and Functional Programming with Python*.
+
+---
+
+## Features
+
+| | |
+|---|---|
+| **Daily & weekly habits** | Two periodicities, different streak rules per type |
+| **Streak engine** | Consecutive calendar days (daily) or Mon–Sun weeks (weekly) |
+| **Broken detection** | See at a glance if you missed the current period |
+| **Functional analytics** | `filter`, `map`, `reduce` — no classes in `analytics.py` |
+| **Sample data** | 5 preloaded habits + ~4 weeks of realistic history on first run |
+| **SQLite persistence** | Lightweight `habits.db`, created automatically |
+
+---
+
+## Tech stack
+
+`Python` · `SQLite3` · `Click` · `pytest` · `datetime` · `functools`
+
+---
+
+## Installation
+
+**Requirements:** Python 3.7+, pip
 
 ```bash
-cd habit_tracker
+git clone https://github.com/SudhanshuBiswas01/habit-forge-iu-germany.git
+cd habit-forge-iu-germany
 pip install -r requirements.txt
 ```
 
-## Run
+---
 
-From the `habit_tracker` folder:
+## Usage
+
+Start the interactive CLI from the project root:
 
 ```bash
 python cli.py
 ```
 
-On first run the app seeds five sample habits with about four weeks of history (only when the database is empty).
+### Main menu
 
-## Tests
-
-```bash
-pytest
+```
+--- Habit Tracker ---
+1. Create Habit
+2. Complete a Habit
+3. View All Habits
+4. Analytics Menu
+5. Delete a Habit
+6. Exit
 ```
 
-Run from `habit_tracker` so imports resolve correctly.
+**Analytics submenu** — list all habits, filter by periodicity, longest streak (all or one habit).
 
-## Reset / reseed data
+### First run
 
-Delete `habits.db` in the project folder and start the app again. Preload runs only when there are no habits in the database.
+If the database is empty, the app seeds **5 sample habits** with about **4 weeks** of completion history:
+
+| Habit | Period |
+|-------|--------|
+| Drink 2L of Water | daily |
+| Morning Workout | daily |
+| Read 20 Pages | daily |
+| Weekly Review | weekly |
+| Grocery Shopping | weekly |
+
+### Reset / reseed
+
+```bash
+# delete the db, then run again
+rm habits.db        # macOS / Linux
+del habits.db       # Windows
+
+python cli.py
+```
+
+Preload only runs when there are **zero** habits in the database.
+
+---
+
+## Testing
+
+```bash
+pytest -v
+```
+
+Tests use an **in-memory SQLite** database — your real `habits.db` is never touched.
+
+```
+tests/
+├── test_habit.py       # model, completions, streaks, is_broken
+└── test_analytics.py   # filter / map / reduce helpers
+```
+
+---
 
 ## Project structure
 
 ```
 habit_tracker/
-├── habit.py          # Habit model + streak logic
-├── db.py             # SQLite persistence
-├── tracker.py        # HabitTracker service
-├── analytics.py      # Functional helpers (filter/map/reduce)
-├── cli.py            # Click CLI entry point
-├── preload.py        # Sample data seeding
+├── habit.py          # Habit class — streaks, completions, broken check
+├── db.py             # Database — SQLite CRUD
+├── tracker.py        # HabitTracker — create, complete, delete, preload
+├── analytics.py      # Pure functions only (functional programming)
+├── cli.py            # Click CLI — entry point
+├── preload.py        # Seeds 5 habits + dummy history
 ├── tests/
+│   ├── conftest.py
 │   ├── test_habit.py
 │   └── test_analytics.py
-├── habits.db         # created at runtime
+├── habits.db         # generated at runtime (gitignored)
 ├── requirements.txt
 └── README.md
 ```
+
+### How streaks work
+
+- **Daily** — each calendar day is one period; need ≥1 completion that day.
+- **Weekly** — each Monday–Sunday week is one period.
+- **Streak** — count of consecutive periods (going backward) with at least one completion.
+- **Current period empty?** — streak is calculated from the last completed period, not from today.
+
+---
+
+## Tags
+
+Topics for this repo (GitHub **Settings → Topics**):
+
+```
+python habit-tracker cli sqlite click pytest
+object-oriented-programming functional-programming
+iu-germany portfolio-project terminal-app streak-tracker
+```
+
+---
+
+## Author
+
+**Sudhanshu Biswas**  
+IU Germany · Object Oriented & Functional Programming with Python
+
+[![GitHub](https://img.shields.io/badge/@SudhanshuBiswas01-181717?style=flat-square&logo=github)](https://github.com/SudhanshuBiswas01)
+
+---
+
+<div align="center">
+
+*Small habits compound. This app just counts them.*
+
+</div>
