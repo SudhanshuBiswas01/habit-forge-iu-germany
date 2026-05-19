@@ -34,8 +34,8 @@ Built as a **5th semester elective** project: *Object Oriented and Functional Pr
 
 ## Features
 
-| | |
-|---|---|
+| Feature | Description |
+|---------|-------------|
 | **Daily & weekly habits** | Two periodicities, different streak rules per type |
 | **Streak engine** | Consecutive calendar days (daily) or Mon–Sun weeks (weekly) |
 | **Broken detection** | See at a glance if you missed the current period |
@@ -59,7 +59,10 @@ Built as a **5th semester elective** project: *Object Oriented and Functional Pr
 git clone https://github.com/SudhanshuBiswas01/habit-forge-iu-germany.git
 cd habit-forge-iu-germany
 pip install -r requirements.txt
+python cli.py
 ```
+
+> **Quick start:** clone → install → run `python cli.py`. Sample habits load automatically on first launch.
 
 ---
 
@@ -130,7 +133,7 @@ tests/
 ## Project structure
 
 ```
-habit_tracker/
+habit-forge-iu-germany/    # repo root (after git clone)
 ├── habit.py          # Habit class — streaks, completions, broken check
 ├── db.py             # Database — SQLite CRUD
 ├── tracker.py        # HabitTracker — create, complete, delete, preload
