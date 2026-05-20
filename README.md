@@ -28,7 +28,9 @@ A command-line habit tracker built for **IU Germany** — object-oriented design
 
 **Habit Forge** is a terminal-based habit tracker where you create daily or weekly habits, log completions, and watch your streaks grow (or crumble). No web server, no ORM — just Python, SQLite, and a Click-powered menu.
 
-Built as a **5th semester elective** project: *Object Oriented and Functional Programming with Python*.
+Built as a **5th semester elective** (2025/26) at IU Germany: *Object Oriented and Functional Programming with Python*.
+
+**Dependencies:** `click`, `pytest` — SQLite is in the Python standard library.
 
 ---
 
@@ -86,7 +88,13 @@ python cli.py
 6. Exit
 ```
 
-**Analytics submenu** — list all habits, filter by periodicity, longest streak (all or one habit).
+**Analytics submenu** — list all habits, filter by periodicity, longest streak (all habits or pick one).
+
+Example habit line when viewing all:
+
+```
+Morning Workout  |  daily  |  streak: 12  |  on track
+```
 
 ### First run
 
@@ -172,8 +180,8 @@ iu-germany portfolio-project terminal-app streak-tracker
 
 ## Author
 
-**Sudhanshu Biswas**  
-IU Germany · Object Oriented & Functional Programming with Python
+**Sudhanshu Biswas** · [GitHub](https://github.com/SudhanshuBiswas01)  
+IU International University of Applied Sciences — OOP & Functional Programming (Python)
 
 [![GitHub](https://img.shields.io/badge/@SudhanshuBiswas01-181717?style=flat-square&logo=github)](https://github.com/SudhanshuBiswas01)
 
