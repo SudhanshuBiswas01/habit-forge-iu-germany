@@ -18,7 +18,7 @@ A command-line habit tracker built for **IU Germany** — object-oriented design
 [![OOP](https://img.shields.io/badge/Paradigm-OOP%20%2B%20Functional-orange?style=flat-square)]()
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square)]()
 
-[Features](#-features) · [Install](#-installation) · [Usage](#-usage) · [Tests](#-testing) · [Structure](#-project-structure) · [Author](#-author)
+[Features](#-features) · [Demo](#-demo-screenshots) · [Install](#-installation) · [Usage](#-usage) · [Tests](#-testing) · [Structure](#-project-structure) · [Author](#-author)
 
 </div>
 
@@ -50,6 +50,56 @@ Built as a **5th semester elective** (2025/26) at IU Germany: *Object Oriented a
 ## Tech stack
 
 `Python` · `SQLite3` · `Click` · `pytest` · `datetime` · `functools`
+
+---
+
+## Demo (screenshots)
+
+Step-by-step walkthrough of the CLI and tests.
+
+### Step 1 — Run the CLI (`python cli.py`)
+
+Main menu on first launch (sample habits load automatically):
+
+![Main menu](screenshots/01-main-menu.png)
+
+---
+
+### Step 2 — Create a habit
+
+Choose **1**, enter name, description, and periodicity. The habit is saved to SQLite:
+
+![Create habit](screenshots/02-create-habit.png)
+
+---
+
+### Step 3 — View all habits
+
+Choose **3** to see every habit with **streak** and **on track / broken** status:
+
+![View all habits with streaks](screenshots/03-view-all-habits.png)
+
+---
+
+### Step 4 — Analytics menu
+
+Choose **4** from the main menu.
+
+**4a — Longest streak (all habits)** — option `c`:
+
+![Analytics — longest streak](screenshots/04-analytics-longest-streak.png)
+
+**4b — Filter by periodicity** — option `b`, then `daily`:
+
+![Analytics — filter daily habits](screenshots/05-analytics-filter-daily.png)
+
+---
+
+### Step 5 — Run tests (`pytest -v`)
+
+All unit tests pass (in-memory DB — your `habits.db` is not used):
+
+![pytest results](screenshots/06-pytest.png)
 
 ---
 
@@ -152,6 +202,7 @@ habit-forge-iu-germany/    # repo root (after git clone)
 │   ├── conftest.py
 │   ├── test_habit.py
 │   └── test_analytics.py
+├── screenshots/      # CLI & pytest demo images
 ├── habits.db         # generated at runtime (gitignored)
 ├── requirements.txt
 └── README.md
