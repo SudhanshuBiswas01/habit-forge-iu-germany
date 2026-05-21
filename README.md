@@ -18,7 +18,7 @@ A command-line habit tracker built for **IU Germany** — object-oriented design
 [![OOP](https://img.shields.io/badge/Paradigm-OOP%20%2B%20Functional-orange?style=flat-square)]()
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square)]()
 
-[Features](#-features) · [Demo](#-demo-screenshots) · [Install](#-installation) · [Usage](#-usage) · [Tests](#-testing) · [Structure](#-project-structure) · [Author](#-author)
+[Features](#-features) · [Demo](#-demo-screenshots) · [HLD](docs/HLD.md) · [Install](#-installation) · [Usage](#-usage) · [Tests](#-testing) · [Structure](#-project-structure) · [Author](#-author)
 
 </div>
 
@@ -31,6 +31,8 @@ A command-line habit tracker built for **IU Germany** — object-oriented design
 Built as a **5th semester elective** (2025/26) at IU Germany: *Object Oriented and Functional Programming with Python*.
 
 **Dependencies:** `click`, `pytest` — SQLite is in the Python standard library.
+
+**Architecture:** see [High-Level Design (HLD)](docs/HLD.md) — Mermaid diagrams for layers, classes, DB schema, and flows.
 
 ---
 
@@ -202,6 +204,8 @@ habit-forge-iu-germany/    # repo root (after git clone)
 │   ├── conftest.py
 │   ├── test_habit.py
 │   └── test_analytics.py
+├── docs/
+│   └── HLD.md        # high-level design (Mermaid)
 ├── screenshots/      # CLI & pytest demo images
 ├── habits.db         # generated at runtime (gitignored)
 ├── requirements.txt
