@@ -18,7 +18,7 @@ A command-line habit tracker built for **IU Germany** — object-oriented design
 [![OOP](https://img.shields.io/badge/Paradigm-OOP%20%2B%20Functional-orange?style=flat-square)]()
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square)]()
 
-[Features](#-features) · [Demo](#-demo-screenshots) · [HLD](docs/HLD.md) · [Install](#-installation) · [Usage](#-usage) · [Tests](#-testing) · [Structure](#-project-structure) · [Author](#-author)
+[Features](#-features) · [Demo](#-demo-screenshots) · [HLD](#-high-level-design-hld) · [Install](#-installation) · [Usage](#-usage) · [Tests](#-testing) · [Structure](#-project-structure) · [Author](#-author)
 
 </div>
 
@@ -32,7 +32,6 @@ Built as a **5th semester elective** (2025/26) at IU Germany: *Object Oriented a
 
 **Dependencies:** `click`, `pytest` — SQLite is in the Python standard library.
 
-**Architecture:** see [High-Level Design (HLD)](docs/HLD.md) — Mermaid diagrams for layers, classes, DB schema, and flows.
 
 ---
 
@@ -102,6 +101,222 @@ Choose **4** from the main menu.
 All unit tests pass (in-memory DB — your `habits.db` is not used):
 
 ![pytest results](screenshots/06-pytest.png)
+
+---
+
+## High-Level Design (HLD)
+
+Architecture overview — layers, classes, database, and main flows (Mermaid).
+
+### System context
+
+```mermaid
+flowchart LR
+    User([User])
+    CLI[cli.py\nClick menu]
+    App[tracker.py\nHabitTracker]
+    Model[habit.py\nHabit]
+    DB[(habits.db\nSQLite)]
+    Analytics[analytics.py\npure functions]
+    Seed[preload.py\nsample data]
+
+    User --> CLI
+    CLI --> App
+    CLI --> Analytics
+    App --> Model
+    App --> DB
+    Model --> DB
+    Analytics --> Model
+    Analytics --> DB
+    App --> Seed
+    Seed --> DB
+```
+
+Single-user CLI. No network. Analytics uses `filter` / `map` / `reduce` — no classes in `analytics.py`.
+
+### Layered architecture
+
+```mermaid
+flowchart TB
+    subgraph presentation [Presentation]
+        CLI[cli.py]
+    end
+
+    subgraph application [Application]
+        TR[tracker.py]
+        PL[preload.py]
+    end
+
+    subgraph domain [Domain - OOP]
+        H[habit.py - Habit]
+    end
+
+    subgraph functional [Functional]
+        AN[analytics.py]
+    end
+
+    subgraph persistence [Persistence]
+        DB[db.py - Database]
+        SQL[(habits.db)]
+    end
+
+    CLI --> TR
+    CLI --> AN
+    TR --> H
+    TR --> DB
+    TR --> PL
+    PL --> DB
+    H --> DB
+    AN --> H
+    DB --> SQL
+```
+
+| Layer | Module | Responsibility |
+|-------|--------|----------------|
+| Presentation | `cli.py` | Menus, user input, output |
+| Application | `tracker.py` | Create / delete / complete habits |
+| Application | `preload.py` | Seed sample data (empty DB only) |
+| Domain | `habit.py` | Habit entity, streak & broken logic |
+| Functional | `analytics.py` | Filter / map / reduce over habits |
+| Persistence | `db.py` | SQLite CRUD |
+
+### Class diagram (OOP)
+
+```mermaid
+classDiagram
+    class Habit {
+        +int habit_id
+        +str name
+        +str description
+        +str periodicity
+        +datetime created_at
+        +complete(db)
+        +get_streak(db) int
+        +is_broken(db) bool
+        +get_completions(db) list
+    }
+
+    class Database {
+        +str db_path
+        +Connection conn
+        +connect()
+        +save_habit(habit) int
+        +delete_habit(habit_id)
+        +load_all_habits() list
+        +save_completion(habit_id, dt)
+        +load_completions(habit_id) list
+        +is_empty() bool
+    }
+
+    class HabitTracker {
+        +Database db
+        +create_habit(name, desc, period) Habit
+        +delete_habit(habit_id)
+        +complete_habit(habit_id)
+        +get_all_habits() list
+        +load_predefined_habits() bool
+    }
+
+    HabitTracker --> Database : uses
+    Habit --> Database : completions
+    HabitTracker ..> Habit : creates
+    Database ..> Habit : loads
+```
+
+### Database schema
+
+```mermaid
+erDiagram
+    HABITS ||--o{ COMPLETIONS : has
+
+    HABITS {
+        int habit_id PK
+        text name
+        text description
+        text periodicity
+        text created_at
+    }
+
+    COMPLETIONS {
+        int completion_id PK
+        int habit_id FK
+        text completed_at
+    }
+```
+
+Datetimes stored as **ISO 8601** text in SQLite.
+
+### Flow — complete a habit
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant C as cli.py
+    participant T as HabitTracker
+    participant H as Habit
+    participant D as Database
+
+    U->>C: Choose 2
+    C->>T: get_all_habits()
+    T->>D: load_all_habits()
+    D-->>T: habits
+    U->>C: habit_id
+    C->>T: complete_habit(id)
+    T->>H: complete(db)
+    H->>D: save_completion(id, now)
+```
+
+### Flow — analytics (longest streak)
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant C as cli.py
+    participant T as HabitTracker
+    participant A as analytics.py
+    participant H as Habit
+    participant D as Database
+
+    U->>C: Analytics option c
+    C->>T: get_all_habits()
+    T->>D: load_all_habits()
+    C->>A: get_longest_streak_all(habits, db)
+    loop each habit
+        A->>H: get_streak(db)
+        H->>D: load_completions()
+    end
+    A-->>C: max streak
+```
+
+### Streak logic
+
+```mermaid
+flowchart TD
+    Start([get_streak]) --> Load[Load completions]
+    Load --> Empty{Any?}
+    Empty -->|No| Zero[Return 0]
+    Empty -->|Yes| Period[Find start period]
+    Period --> Walk[Walk backward by period]
+    Walk --> Done{Has completion?}
+    Done -->|Yes| Inc[streak++]
+    Inc --> Walk
+    Done -->|No| Ret[Return streak]
+```
+
+| Periodicity | One period |
+|-------------|------------|
+| `daily` | Calendar day |
+| `weekly` | Monday – Sunday |
+
+### Design decisions
+
+| Decision | Why |
+|----------|-----|
+| SQLite + raw SQL | Simple, no ORM |
+| `Habit` owns streak logic | Domain stays on the entity |
+| Separate `analytics.py` | OOP vs functional split for the course |
+| `preload.py` isolated | Easy reset / demo data |
+| Click CLI | Clean menus, less boilerplate |
 
 ---
 
@@ -204,8 +419,6 @@ habit-forge-iu-germany/    # repo root (after git clone)
 │   ├── conftest.py
 │   ├── test_habit.py
 │   └── test_analytics.py
-├── docs/
-│   └── HLD.md        # high-level design (Mermaid)
 ├── screenshots/      # CLI & pytest demo images
 ├── habits.db         # generated at runtime (gitignored)
 ├── requirements.txt
